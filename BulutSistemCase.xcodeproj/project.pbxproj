@@ -11,6 +11,8 @@
 		EB5966702BE4E313005E076F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB59666F2BE4E313005E076F /* ContentView.swift */; };
 		EB5966722BE4E314005E076F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB5966712BE4E314005E076F /* Assets.xcassets */; };
 		EB5966752BE4E314005E076F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB5966742BE4E314005E076F /* Preview Assets.xcassets */; };
+		EB5966972BE4EF4C005E076F /* WeatherDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5966962BE4EF4C005E076F /* WeatherDataService.swift */; };
+		EB59669A2BE4EFB9005E076F /* NetworkingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5966992BE4EFB9005E076F /* NetworkingManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		EB59666F2BE4E313005E076F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		EB5966712BE4E314005E076F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EB5966742BE4E314005E076F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		EB5966962BE4EF4C005E076F /* WeatherDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDataService.swift; sourceTree = "<group>"; };
+		EB5966992BE4EFB9005E076F /* NetworkingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +55,8 @@
 		EB59666C2BE4E313005E076F /* BulutSistemCase */ = {
 			isa = PBXGroup;
 			children = (
+				EB5966982BE4EFAA005E076F /* Utilities */,
+				EB5966952BE4EF40005E076F /* Services */,
 				EB59666D2BE4E313005E076F /* BulutSistemCaseApp.swift */,
 				EB59666F2BE4E313005E076F /* ContentView.swift */,
 				EB5966712BE4E314005E076F /* Assets.xcassets */,
@@ -65,6 +71,22 @@
 				EB5966742BE4E314005E076F /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		EB5966952BE4EF40005E076F /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				EB5966962BE4EF4C005E076F /* WeatherDataService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		EB5966982BE4EFAA005E076F /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				EB5966992BE4EFB9005E076F /* NetworkingManager.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -139,6 +161,8 @@
 			files = (
 				EB5966702BE4E313005E076F /* ContentView.swift in Sources */,
 				EB59666E2BE4E313005E076F /* BulutSistemCaseApp.swift in Sources */,
+				EB59669A2BE4EFB9005E076F /* NetworkingManager.swift in Sources */,
+				EB5966972BE4EF4C005E076F /* WeatherDataService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
