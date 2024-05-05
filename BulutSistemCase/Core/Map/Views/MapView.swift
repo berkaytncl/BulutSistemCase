@@ -30,9 +30,6 @@ struct MapView: View {
             }
             .padding(20)
         }
-        .onAppear {
-            debugPrint(viewModel.weatherDatas)
-        }
     }
 }
 
