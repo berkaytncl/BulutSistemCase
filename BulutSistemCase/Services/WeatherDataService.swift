@@ -10,25 +10,70 @@ import Combine
 
 final class WeatherDataService {
     
-    @Published var weatherData: WeatherData? = nil
+    @Published private(set) var currentLocationWeatherData: WeatherData? = nil
+    @Published private(set) var favoritedWeatherDatas: [WeatherData] = []
     
-    var weatherDataSubscription: AnyCancellable?
+    private let apiKey = "23ad6da6c56b202ecc38240b92e78d2c"
+    private let favoriteLocationsManager = FavoriteLocationsDataManager.instance
+    private var cancellables = Set<AnyCancellable>()
     
-    init(coord: Coord) {
-        getWeatherData(coord: coord)
+    init() {
+        getFavoriteWeatherDatas()
     }
     
-    func getWeatherData(coord: Coord) {
-        guard let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?lat=\(coord.lat)&lon=\(coord.lon)&appid=23ad6da6c56b202ecc38240b92e78d2c") else { return }
-         
-        weatherDataSubscription = NetworkingManager.download(url: url)
+    private func getWeatherData(coord: Coord) {
+        guard let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?lat=\(coord.lat)&lon=\(coord.lon)&appid=\(apiKey)") else { return }
+        
+        NetworkingManager.download(url: url)
             .decode(type: WeatherData.self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: NetworkingManager.handleCompletion,
                   receiveValue: { [weak self] returnedWeatherData in
                 guard let self else { return }
-                self.weatherData = returnedWeatherData
-                self.weatherDataSubscription?.cancel()
+                self.currentLocationWeatherData = returnedWeatherData
             })
+            .store(in: &cancellables)
+    }
+    
+    private func getWeatherData(name: String) {
+        guard let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=\(name)&appid=\(apiKey)") else { return }
+        
+        NetworkingManager.download(url: url)
+            .decode(type: WeatherData.self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: NetworkingManager.handleCompletion,
+                  receiveValue: { [weak self] returnedWeatherData in
+                guard let self else { return }
+                self.favoritedWeatherDatas.append(returnedWeatherData)
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func getCurrentLocationWeatherData(coord: Coord) {
+        currentLocationWeatherData = nil
+        getWeatherData(coord: coord)
+    }
+    
+    private func getFavoriteWeatherDatas() {
+        favoritedWeatherDatas = []
+        favoriteLocationsManager.savedEntities.forEach { entity in
+            if let name = entity.name {
+                getWeatherData(name: name)
+            }
+        }
+    }
+}
+
+extension WeatherDataService {
+    func updateLocation(coord: Coord) {
+        getCurrentLocationWeatherData(coord: coord)
+    }
+    
+    func addNewFavoriteLocation(_ name: String) {
+        favoriteLocationsManager.addNewFavoriteLocation(name)
+    }
+    
+    func removeFavoriteLocation(_ name: String) {
+        favoriteLocationsManager.removeFavoriteLocation(name)
     }
 }
