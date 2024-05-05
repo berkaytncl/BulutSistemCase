@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct BulutSistemCaseApp: App {
+    
+    init() {
+        UINavigationBar.changeAppearance()
+        UIToolbar.changeAppearance(clear: true)
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }
