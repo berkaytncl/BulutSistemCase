@@ -7,6 +7,8 @@
 
 import Foundation
 
-struct Coord: Codable {
+struct Coord: Codable, Equatable {
     let lat, lon: Double
+    
+    static func == (lhs: Coord, rhs: Coord) -> Bool { lhs.lat == rhs.lat && lhs.lon == rhs.lon }
 }
