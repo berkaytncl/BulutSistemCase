@@ -9,22 +9,24 @@ import SwiftUI
 
 struct WeatherLogoView: View {
     
-    let weatherData: WeatherData
+    let weather: Weather
+    let conditions: WeatherCondition
     let size: CGFloat
     
-    init(weatherData: WeatherData, size: CGFloat = 100) {
-        self.weatherData = weatherData
+    init(weather: Weather, conditions: WeatherCondition, size: CGFloat = 100) {
+        self.weather = weather
+        self.conditions = conditions
         self.size = size
     }
     
     var body: some View {
         VStack(spacing: 0) {
-            WeatherImageView(icon: weatherData.weather[0].icon)
+            WeatherImageView(icon: weather.icon)
                 .frame(width: size, height: size)
-            Text(weatherData.weather[0].description.capitalized)
+            Text(weather.description.capitalized)
             HStack(spacing: 8) {
-                Text("H:\(weatherData.conditions.tempMax.convertKelvinToCelsius())°")
-                Text("L:\(weatherData.conditions.tempMin.convertKelvinToCelsius())°")
+                Text("H:\(conditions.tempMax.convertKelvinToCelsius())°")
+                Text("L:\(conditions.tempMin.convertKelvinToCelsius())°")
             }
         }
         .font(.system(size: 16, weight: .regular))
@@ -32,5 +34,6 @@ struct WeatherLogoView: View {
 }
 
 #Preview {
-    WeatherLogoView(weatherData: WeatherData.exampleWeatherData)
+    let example = WeatherData.exampleWeatherData
+    return WeatherLogoView(weather: example.weather[0], conditions: example.conditions)
 }

@@ -35,7 +35,9 @@ struct LocationPreviewView: View {
 extension LocationPreviewView {
     private var imageSection: some View {
         ZStack {
-            WeatherLogoView(weatherData: viewModel.selectedLocationData)
+            WeatherLogoView(
+                weather: viewModel.selectedLocationData.weather[0],
+                conditions: viewModel.selectedLocationData.conditions)
                 .scaledToFill()
                 .cornerRadius(10)
         }
