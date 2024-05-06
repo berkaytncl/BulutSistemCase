@@ -35,7 +35,7 @@ final class WeatherDataService {
             .store(in: &cancellables)
     }
     
-    private func getWeatherData(name: String) {
+    private func getWeatherData(name: String, at index: Int? = nil) {
         guard let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=\(name)&appid=\(apiKey)") else { return }
         
         NetworkingManager.download(url: url)
@@ -44,13 +44,17 @@ final class WeatherDataService {
             .sink(receiveCompletion: NetworkingManager.handleCompletion,
                   receiveValue: { [weak self] returnedWeatherData in
                 guard let self else { return }
-                self.favoritedWeatherDatas.append(returnedWeatherData)
+                if let index {
+                    self.favoritedWeatherDatas.remove(at: index)
+                    self.favoritedWeatherDatas.insert(returnedWeatherData, at: index)
+                } else {
+                    self.favoritedWeatherDatas.append(returnedWeatherData)
+                }
             })
             .store(in: &cancellables)
     }
     
     private func getCurrentLocationWeatherData(coord: Coord) {
-        currentLocationWeatherData = nil
         getWeatherData(coord: coord)
     }
     
@@ -62,6 +66,10 @@ final class WeatherDataService {
             }
         }
     }
+    
+    private func refreshIndexData(name: String, index: Int) {
+        getWeatherData(name: name, at: index)
+    }
 }
 
 extension WeatherDataService {
@@ -69,11 +77,14 @@ extension WeatherDataService {
         getCurrentLocationWeatherData(coord: coord)
     }
     
-    func addNewFavoriteLocation(_ name: String) {
-        favoriteLocationsManager.addNewFavoriteLocation(name)
+    func updateData(at index: Int) {
+        let favoriteListIndex = index - 1
+        guard favoriteListIndex <= favoritedWeatherDatas.count else { return }
+        let name = favoritedWeatherDatas[favoriteListIndex].name
+        refreshIndexData(name: name, index: favoriteListIndex)
     }
     
-    func removeFavoriteLocation(_ name: String) {
-        favoriteLocationsManager.removeFavoriteLocation(name)
+    func updatedFavoriteDatas() {
+        getFavoriteWeatherDatas()
     }
 }

@@ -13,12 +13,13 @@ final class WeatherViewModel: ObservableObject {
     
     @Published private(set) var weatherDatas: [WeatherData] = []
     @Published var selectedWeatherData: WeatherData?
-    @Published var tempSelectedWeatherData: WeatherData?
     
-    @Published private(set) var coord: Coord?
+    @Published private var forecastDatas: [ForecastData] = []
     
     private let weatherDataService = WeatherDataService()
+    private let forecastDataService = ForecastDataService()
     private let locationManager = LocationManager()
+    
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -30,15 +31,22 @@ final class WeatherViewModel: ObservableObject {
             .combineLatest(weatherDataService.$favoritedWeatherDatas)
             .map(mapAllWeatherData)
             .sink { [weak self] returnedWeatherDatas in
-                self?.weatherDatas = returnedWeatherDatas
+                guard let self else { return }
+                self.weatherDatas = returnedWeatherDatas
+                self.weatherDatasUpdated()
             }
             .store(in: &cancellables)
         
         locationManager.$lastKnownLocation
             .sink { [weak self] coord in
                 guard let self else { return }
-                self.coord = coord
-                self.updateLocation()
+                self.updateLocation(coord: coord)
+            }
+            .store(in: &cancellables)
+        
+        forecastDataService.$forecastDatas
+            .sink { [weak self] forecastDatas in
+                self?.forecastDatas = forecastDatas
             }
             .store(in: &cancellables)
     }
@@ -51,21 +59,49 @@ final class WeatherViewModel: ObservableObject {
         return weatherDatas
     }
     
-    func selectWeatherData() {
-        selectedWeatherData = tempSelectedWeatherData
+    private func mapWeatherDataToForecastData(weatherData: WeatherData?) -> ForecastData? {
+        guard let weatherData else { return nil }
+        return forecastDatas.first { $0.city.name == weatherData.name }
+    }
+    
+    private func weatherDatasUpdated() {
+        forecastDataService.updateForecastDatas(names: weatherDatas.map { $0.name })
+    }
+    
+    func matchedForecastData(weatherData: WeatherData) -> ForecastData? {
+        mapWeatherDataToForecastData(weatherData: weatherData)
+    }
+    
+    func selectWeatherData(weatherData: WeatherData) {
+        selectedWeatherData = weatherData
     }
     
     func deselectWeatherData() {
         selectedWeatherData = nil
+    }
+    
+    func weatherDatasIsContain(name: String) -> Bool {
+        weatherDatas
+            .map { $0.name }
+            .filter { $0 == name }
+            .isEmpty
     }
 }
 
 // MARK: WeatherDataService
 
 extension WeatherViewModel {
-    func updateLocation() {
+    func updateLocation(coord: Coord?) {
         guard let coord else { return }
         weatherDataService.updateLocation(coord: coord)
+    }
+    
+    func updateData(at index: Int) {
+        weatherDataService.updateData(at: index)
+    }
+    
+    func updatedFavoriteDatas() {
+        weatherDataService.updatedFavoriteDatas()
     }
 }
 

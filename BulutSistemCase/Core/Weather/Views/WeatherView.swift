@@ -10,7 +10,7 @@ import SwiftUI
 struct WeatherView: View {
     
     @StateObject private var viewModel = WeatherViewModel()
-    @State private var showAddFavoriteView: Bool = false
+    @State private var selectedTab = 0
     
     let pub = NotificationCenter.default
         .publisher(for: .closeMapViewNotification)
@@ -23,9 +23,6 @@ struct WeatherView: View {
         .onReceive(pub) { _ in
             viewModel.deselectWeatherData()
         }
-        .sheet(isPresented: $showAddFavoriteView, content: {
-            FavoriteView()
-        })
         .fullScreenCover(item: $viewModel.selectedWeatherData, content: { selectedWeatherData in
             MapView(weatherDatas: viewModel.weatherDatas, selectedWeatherData: selectedWeatherData)
         })
@@ -35,24 +32,30 @@ struct WeatherView: View {
 extension WeatherView {
     private func scrollViewMainContent(proxy: GeometryProxy) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
-            TabView {
-                ForEach(viewModel.weatherDatas, id: \.id) { weatherData in
-                    WeatherCell(weatherData: weatherData)
-                        .onAppear {
-                            viewModel.tempSelectedWeatherData = weatherData
-                        }
+            TabView(selection: $selectedTab) {
+                ForEach(Array(viewModel.weatherDatas.enumerated()), id: \.element) { index, weatherData in
+                    WeatherCell(
+                        weatherData: weatherData,
+                        forecastData: viewModel.matchedForecastData(weatherData: weatherData),
+                        proxy: proxy)
+                    .tag(index)
                 }
             }
             .frame(height: proxy.size.height)
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
         .refreshable {
-            viewModel.startUpdatingLocation()
+            if selectedTab == 0 {
+                viewModel.startUpdatingLocation()
+            } else {
+                viewModel.updateData(at: selectedTab)
+            }
         }
         .toolbar(content: {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showAddFavoriteView.toggle()
+                NavigationLink {
+                    FavoriteView()
+                        .environmentObject(viewModel)
                 } label: {
                     Image(systemName: "plus")
                         .font(.headline)
@@ -62,7 +65,9 @@ extension WeatherView {
 
             ToolbarItem(placement: .bottomBar) {
                 Button {
-                    viewModel.selectWeatherData()
+                    if selectedTab < viewModel.weatherDatas.count {
+                        viewModel.selectWeatherData(weatherData: viewModel.weatherDatas[selectedTab])
+                    }
                 } label: {
                     Text("Show on Map")
                         .font(.headline)
