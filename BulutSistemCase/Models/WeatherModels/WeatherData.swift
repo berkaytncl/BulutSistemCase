@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WeatherData: Codable, Equatable, Identifiable {
+struct WeatherData: Codable, Equatable, Identifiable, Hashable {
     let coord: Coord
     let weather: [Weather]
     let base: String
@@ -28,6 +28,10 @@ struct WeatherData: Codable, Equatable, Identifiable {
     }
     
     static func == (lhs: WeatherData, rhs: WeatherData) -> Bool { lhs.id == rhs.id }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine("\(sys.country)\(name)")
+    }
 }
 
 extension WeatherData {
