@@ -32,9 +32,6 @@ final class FavoriteLocationsDataManager {
         let request = NSFetchRequest<FavoriteLocationsEntity>(entityName: entityName)
         do {
             savedEntities = try container.viewContext.fetch(request)
-            if savedEntities.isEmpty {
-                addNewFavoriteLocation("Istanbul")
-            }
         } catch {
             debugPrint("Error fetching Portfolio Entities. \(error)")
         }
